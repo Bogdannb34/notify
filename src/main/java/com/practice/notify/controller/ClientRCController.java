@@ -25,52 +25,51 @@ public class ClientRCController {
     private final ObjectMapper objectMapper;
 
     @PostMapping(value = "/create")
-    public CompletableFuture<ResponseEntity> createClient(HttpEntity<String> httpEntity) throws IOException, SchedulerException {
+    public CompletableFuture<ResponseEntity<?>> createClient(HttpEntity<String> httpEntity) throws IOException, SchedulerException {
         String requestBody = httpEntity.getBody();
 
         // create single client
         if (isClientRC(requestBody)) {
             ClientRC data = unmarshalClientRC(requestBody);
-            CompletableFuture<ResponseEntity> result = service.createClient(data)
-                    .thenApply(client -> new ResponseEntity(client, CREATED));
-            return result;
+            return service.createClient(data)
+                    .thenApply(client -> new ResponseEntity<>(client, CREATED));
         }
-        return CompletableFuture.completedFuture(new ResponseEntity(BAD_REQUEST));
+        return CompletableFuture.completedFuture(new ResponseEntity<>(BAD_REQUEST));
     }
 
     @GetMapping(value = "/clients/{id}")
-    public CompletableFuture<ResponseEntity> getClient(@PathVariable("id") String id) {
+    public CompletableFuture<ResponseEntity<?>> getClient(@PathVariable("id") String id) {
         return service.retrieveClient(id)
                 .thenApply(optionalClient ->
                         optionalClient.map(
-                                client -> new ResponseEntity(client, OK)
-                        ).orElseGet(() -> new ResponseEntity(NOT_FOUND)));
+                                client -> new ResponseEntity<>(client, OK)
+                        ).orElseGet(() -> new ResponseEntity<>(NOT_FOUND)));
     }
 
     @GetMapping(value = "/clients/{email}")
-    public CompletableFuture<ResponseEntity> getClientByEmail(@PathVariable("email") String email) {
+    public CompletableFuture<ResponseEntity<?>> getClientByEmail(@PathVariable("email") String email) {
         return service.retrieveClientByEmail(email)
                 .thenApply(optionalClient ->
                         optionalClient.map(
-                                client -> new ResponseEntity(client, OK)
-                        ).orElseGet(() -> new ResponseEntity(NOT_FOUND)));
+                                client -> new ResponseEntity<>(client, OK)
+                        ).orElseGet(() -> new ResponseEntity<>(NOT_FOUND)));
     }
 
     @PutMapping(value = "/clients/{id}")
-    public CompletableFuture<ResponseEntity> updateClient(@PathVariable("id") String id, @RequestBody ClientRC clientRC) {
+    public CompletableFuture<ResponseEntity<?>> updateClient(@PathVariable("id") String id, @RequestBody ClientRC clientRC) {
         return service.updateClient(id, clientRC)
                 .thenApply(optionalClient ->
-                        optionalClient.map(client -> new ResponseEntity(client, ACCEPTED))
-                                .orElseGet(() -> new ResponseEntity(NOT_FOUND)));
+                        optionalClient.map(client -> new ResponseEntity<>(client, ACCEPTED))
+                                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND)));
     }
 
     @DeleteMapping(value = "/clients/{id}")
-    public CompletableFuture<ResponseEntity> deleteClient(@PathVariable("id") String id) {
+    public CompletableFuture<ResponseEntity<?>> deleteClient(@PathVariable("id") String id) {
         return service.deleteClient(id)
                 .thenApply(optionalClient ->
                         optionalClient.map(
-                                client -> new ResponseEntity(client, GONE)
-                        ).orElseGet(() -> new ResponseEntity(NOT_FOUND)));
+                                client -> new ResponseEntity<>(client, GONE)
+                        ).orElseGet(() -> new ResponseEntity<>(NOT_FOUND)));
     }
 
 
